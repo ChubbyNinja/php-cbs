@@ -12,7 +12,12 @@ namespace CBS;
 class menu
 {
 
-    public static function loadWelcomeScreen() {
+    public function printInit() {
+        $this->printWelcomeScreen();
+        $this->printMainMenu();
+    }
+
+    public function printWelcomeScreen() {
         output::clearScreen();
         output::lineBreak('~');
         output::lineBreak('~','half');
@@ -23,7 +28,7 @@ class menu
         output::blankRow();
     }
 
-    public static function loadMainMenu() {
+    public function printMainMenu() {
 
         output::message('What would you like to do?', 5);
         output::message('1. Add a movie', 5);
@@ -35,12 +40,44 @@ class menu
         output::message('7. List bookings', 5);
         output::blankRow();
 
-        $response = input::getIntResponse(1,7);
+        $input = new input();
+        $response = $input->getIntResponse(1,7)->getInputData();
 
 
         switch( $response ) {
             case 1:
-                movies::addMovie();
+                $movies = new movies();
+                $movies->addMovie();
+                break;
+
+            case 2:
+                $movies = new movies();
+                $movies->deleteMovie();
+                break;
+
+            case 3:
+                $movies = new movies();
+                $movies->ListMovies();
+                break;
+
+            case 4:
+                $movies = new movies();
+                $movies->printMovie();
+                break;
+
+            case 5:
+                $movies = new movies();
+                $movies->addBooking();
+                break;
+
+            case 6:
+                $movies = new movies();
+                $movies->deleteBooking();
+                break;
+
+            case 7:
+                $movies = new movies();
+                $movies->listBookings();
                 break;
         }
 

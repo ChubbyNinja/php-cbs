@@ -12,6 +12,27 @@ namespace CBS;
 class input
 {
 
+    private $inputData;
+
+    /**
+     * @return mixed
+     */
+    public function getInputData()
+    {
+        return $this->inputData;
+    }
+
+    /**
+     * @param mixed $inputData
+     */
+    public function setInputData($inputData)
+    {
+        $this->inputData = $inputData;
+    }
+
+
+
+
     private function getResponse() {
         $handle = fopen ("php://stdin","r");
         $response = fgets($handle);
@@ -20,90 +41,102 @@ class input
         return $response;
     }
 
-    public static function getIntResponse($min,$max){
-        self::userInput();
+    public function getIntResponse($min,$max, $cancel = false){
+        $this->userInput($cancel);
 
-        $response = self::getResponse();
+        $response = $this->getResponse();
+        $result = trim($response);
 
-        preg_match("/[$min-$max]/", $response, $result);
-        if( !$result ) {
+        if( $cancel && strtolower($result) == 'n' ){
+            $this->setInputData(false);
+            return $this;
+        }
+
+        preg_match("/[$min-$max]/", $result, $matched);
+        if( !$matched ) {
             output::responseError('Please type a numerical value');
-            return self::getIntResponse($min,$max);
+            return $this->getIntResponse($min,$max,$cancel);
         }
 
-        return $response;
+        $this->setInputData($result);
+        return $this;
 
     }
 
-    public static function getStringResponse(){
+    public function getStringResponse($blank = false, $cancel = false){
+        $this->userInput($cancel);
 
-        self::userInput();
+        $response = $this->getResponse();
 
-        $response = self::getResponse();
+        $result = trim($response);
+
+        if( empty($result) && !$blank ) {
+            output::responseError('Value cannot be blank');
+            return $this->getStringResponse($cancel);
+        }
+
+        $this->setInputData($result);
+        return $this;
+
+    }
+
+
+    public function getDateResponse($cancel = false){
+        $this->userInput($cancel);
+
+        $response = $this->getResponse();
 
         $result = trim($response);
 
         if( empty($result) ) {
             output::responseError('Value cannot be blank');
-            return self::getStringResponse();
-        }
-
-        return $result;
-
-    }
-
-
-    public static function getDateResponse(){
-
-        self::userInput();
-
-        $response = self::getResponse();
-
-        $result = trim($response);
-
-        if( empty($result) ) {
-            output::responseError('Value cannot be blank');
-            return self::getDateResponse();
+            return $this->getDateResponse($cancel);
         }
 
         $unixTimestamp = strtotime($result);
 
         if( !$unixTimestamp ) {
             output::responseError('Invalid date format');
-            return self::getDateResponse();
+            return $this->getDateResponse($cancel);
         }
 
         $formatted = date('d/m/Y', strtotime($result) );
 
-        return $formatted;
+        $this->setInputData($formatted);
+        return $this;
+
 
     }
 
 
-    public static function getTimeResponse(){
+    public function getTimeResponse(){
+        $this->userInput();
 
-        self::userInput();
-
-        $response = self::getResponse();
+        $response = $this->getResponse();
 
         $result = trim($response);
 
         if( empty($result) ) {
             output::responseError('Value cannot be blank');
-            return self::getDateResponse();
+            return $this->getDateResponse();
         }
 
-        preg_match("/^(?:[01][0-9]|2[0-3]):[0-5][0-9]/", $response, $result);
-        if( !$result ) {
+        preg_match("/^(?:[01][0-9]|2[0-3]):[0-5][0-9]/", $result, $matched);
+        if( !$matched ) {
             output::responseError('Please format the time as HH:MM');
-            return self::getTimeResponse();
+            return $this->getTimeResponse();
         }
 
-        return $response;
+        $this->setInputData($result);
+        return $this;
+
 
     }
 
-    private function userInput() {
+    private function userInput($cancel = false) {
+        if( $cancel ) {
+            output::message('Type N to cancel',5);
+        }
         echo '     : ';
     }
 

@@ -15,7 +15,7 @@ class output
 
     function __construct()
     {
-        echo exec('tput cols');
+        //echo exec('tput cols');
     }
 
     public static function message( $message, $align = 'left', $colour = null ) {
@@ -44,7 +44,7 @@ class output
 
     }
 
-    private function widthTextToNum($width){
+    private static function widthTextToNum($width){
 
         switch( $width ) {
             case 'full':
@@ -61,7 +61,7 @@ class output
 
     }
 
-    private function addColourToMessage($message,$colour) {
+    private static function addColourToMessage($message,$colour) {
 
         if( is_null($colour) ){
             return $message;
@@ -84,19 +84,11 @@ class output
         return sprintf("\033[%sm%s\033[0m",$colourCode,$message);
     }
 
-    private function setWidth(){
-        self::$width = exec('tput cols');
-    }
-
     public static function getWidth(){
-        if( !self::$width ) {
-            self::setWidth();
-        }
-
-        return self::$width;
+        return 80;
     }
 
-    private function centerAlignMessage($message) {
+    private static function centerAlignMessage($message) {
         $messageLength = self::getMessagelength($message);
 
         if( $messageLength >= self::getWidth() ) {
@@ -108,11 +100,11 @@ class output
         return str_pad($message, $leftPadding + $messageLength, ' ', STR_PAD_LEFT);
     }
 
-    private function getMessagelength($message){
+    private static function getMessagelength($message){
         return strlen($message);
     }
 
-    private function addLeftPaddingToMessage($message,$leftPadding) {
+    private static function addLeftPaddingToMessage($message,$leftPadding) {
         $messageLength = self::getMessagelength($message);
         return str_pad($message, $leftPadding + $messageLength, ' ', STR_PAD_LEFT);
     }
@@ -122,6 +114,6 @@ class output
     }
 
     public static function clearScreen(){
-        system('clear');
+        system('cls');
     }
 }
