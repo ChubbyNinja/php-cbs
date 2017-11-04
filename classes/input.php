@@ -114,6 +114,7 @@ class input
         $response = $this->getResponse();
 
         $result = trim($response);
+        $result = str_replace('/','-',$result);
 
         if( empty($result) ) {
             output::responseError('Value cannot be blank');

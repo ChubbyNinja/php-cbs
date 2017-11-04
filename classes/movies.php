@@ -222,6 +222,8 @@ class movies extends menu
 
         $input = new input();
 
+        $movieDate = str_replace('/','-',$movieDate);
+
         if( !$input->validateDate($movieDate) ) {
             output::responseError('Invalid date format');
             output::responseError('Use "next tuesday" or "24/10/2018"');
