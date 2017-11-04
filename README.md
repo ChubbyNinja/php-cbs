@@ -16,6 +16,8 @@ This can be invoked like so
 
 ## Using the User Interface
 
+![ui example](https://raw.githubusercontent.com/ChubbyNinja/php-cbs/master/ui-example.png "Example UI")
+
 
 You are able to load a text based user interface to navigate
 different parts of the booking system.
