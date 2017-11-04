@@ -9,16 +9,46 @@
 namespace CBS;
 
 
+/**
+ * Class bookings
+ * @package CBS
+ */
 class bookings
 {
+    /**
+     * @var
+     */
     private $movieData;
+    /**
+     * @var
+     */
     private $totalBookings;
+    /**
+     * @var
+     */
     private $allocatedSeats;
+    /**
+     * @var
+     */
     private $bookingId;
+    /**
+     * @var
+     */
     private $customerName;
+    /**
+     * @var
+     */
     private $bookingSeats;
+    /**
+     * @var
+     */
     private $bookingData;
 
+    /**
+     * bookings constructor.
+     * Load movie instance, count bookings and allocated seats
+     * @param $movie
+     */
     public function __construct($movie)
     {
         $this->setMovieData($movie);
@@ -115,7 +145,7 @@ class bookings
     }
 
     /**
-     * @param mixed $bookingSears
+     * @param mixed $bookingSeats
      */
     public function setBookingSeats($bookingSeats)
     {
@@ -139,18 +169,19 @@ class bookings
     }
 
 
-
-
-
-
-
-
+    /**
+     * Count bookings for the movie instance
+     */
     private function countBookings(){
         $totalBookings = \R::count('booking', ' movie_id = ? ', [$this->getMovieData()->getMovieId()]);
         $this->setTotalBookings($totalBookings);
     }
 
 
+    /**
+     * Calculate how many seats are available for this movie
+     * @return mixed
+     */
     public function availableSeats() {
         $totalSeats = $this->getMovieData()->getMovieSeats();
         $allocatedSeats = $this->getAllocatedSeats();
@@ -158,21 +189,37 @@ class bookings
         return $totalSeats - $allocatedSeats;
     }
 
+    /**
+     * Calculate how many seats have been allocated for this movie
+     */
     private function countAllocatedSeats() {
         $allocatedSeats = \R::count('seat', ' movie_id = ? ', [$this->getMovieData()->getMovieId()]);
         $this->setAllocatedSeats($allocatedSeats);
     }
 
-    private function getAllocatedSeatsForBooking( $id ) {
+    /**
+     * Return the seat numbers for a specific booking
+     * @param $id
+     * @return array
+     */
+    private function getAllocatedSeatsForBooking($id ) {
         $allocatedSeats = \R::getAll("SELECT `seat_number` FROM seat WHERE booking_id = ? ", [$id]);
         return array_column($allocatedSeats, 'seat_number');
     }
 
+    /**
+     * Return the seat numbers for a specific movie
+     * @return array
+     */
     public function getAllocatedSeatsForMovie( ) {
         $allocatedSeats = \R::getAll("SELECT `seat_number` FROM seat WHERE movie_id = ? ", [$this->getMovieData()->getMovieId()]);
         return array_column($allocatedSeats, 'seat_number');
     }
 
+    /**
+     * Print the booking table (UI only)
+     * @return $this
+     */
     public function printBookingTable() {
 
         $seatsTaken = $this->getAllocatedSeatsForMovie();
@@ -220,6 +267,11 @@ class bookings
     }
 
 
+    /**
+     * Check if the seat number is available (UI Only)
+     * @param $seats
+     * @return bool
+     */
     private function checkSeatsAvailable($seats){
 
 
@@ -235,6 +287,12 @@ class bookings
 
     }
 
+    /**
+     * Print seat number if available, and x if not (UI Only)
+     * @param $seatNumber
+     * @param $seatsTaken
+     * @return string
+     */
     private function printSeatNumberForTable($seatNumber, $seatsTaken){
 
         if( in_array($seatNumber, $seatsTaken) ) {
@@ -246,6 +304,10 @@ class bookings
 
     }
 
+    /**
+     * Add the booking to the database and allocate the seats
+     * @return int|string
+     */
     public function confirmBooking(){
 
         $seatNumbers = $this->getBookingSeats();
@@ -272,6 +334,11 @@ class bookings
         return $bookingId;
     }
 
+    /**
+     * load the booking data
+     * @param null $id
+     * @return bool
+     */
     public function loadBookingData($id = null) {
         if( $id ) {
             $this->setBookingId($id);
@@ -296,6 +363,10 @@ class bookings
 
     }
 
+    /**
+     * Display the booking details (UI Only)
+     * @param bool $menu
+     */
     public function printBookingDetails($menu = true) {
 
         $m = new movies();
@@ -317,6 +388,10 @@ class bookings
 
     }
 
+    /**
+     * Display the list of bookings
+     * @param null $movieId
+     */
     public function getBookingList($movieId = null){
 
         if( $movieId && $movieId > 0 ) {
@@ -345,6 +420,10 @@ class bookings
     }
 
 
+    /**
+     * Remove a booking
+     * @return bool
+     */
     public function deleteBookingFromDatabase() {
 
         \R::exec("DELETE FROM seat WHERE booking_id = ? ",[$this->getBookingId()]);

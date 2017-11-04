@@ -10,9 +10,21 @@
 require INC_PATH . 'autoload.php';
 require INC_PATH . 'rb.php';
 
+/**
+ * MySQL Hostname, usually localhost or 127.0.0.1
+ */
 define('MYSQL_HOST','localhost');
+/**
+ * MySQL Username
+ */
 define('MYSQL_USER','phpcbs');
+/**
+ * MySQL Database
+ */
 define('MYSQL_DB', 'phpcbs');
+/**
+ * MySQL Password
+ */
 define('MYSQL_PASS','phpcbs');
 
 \R::setup( "mysql:host=127.0.0.1;dbname=".MYSQL_DB,

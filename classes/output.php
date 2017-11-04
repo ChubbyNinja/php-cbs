@@ -9,10 +9,20 @@
 namespace CBS;
 
 
+/**
+ * Class output
+ * @package CBS
+ */
 class output
 {
 
-    public static function message( $message, $align = 'left', $colour = null ) {
+    /**
+     * Output text to terminal
+     * @param $message
+     * @param string $align
+     * @param null $colour
+     */
+    public static function message($message, $align = 'left', $colour = null ) {
 
         if( is_numeric($align) ) {
             $message = self::addLeftPaddingToMessage($message,$align);
@@ -26,10 +36,18 @@ class output
         echo $message . "\n";
     }
 
+    /**
+     * Output blank row to terminal
+     */
     public static function blankRow() {
         self::message(' ');
     }
 
+    /**
+     * Output line break to terminal
+     * @param string $char
+     * @param string $width
+     */
     public static function lineBreak($char = '~', $width = 'full') {
 
         $output = str_repeat($char, self::WidthTextToNum($width));
@@ -38,6 +56,11 @@ class output
 
     }
 
+    /**
+     * Convert text based width to a numerical value to pad text
+     * @param $width
+     * @return float|int|string
+     */
     private static function widthTextToNum($width){
 
         switch( $width ) {
@@ -55,7 +78,13 @@ class output
 
     }
 
-    private static function addColourToMessage($message,$colour) {
+    /**
+     * Add colour to outputted message (UNIX Only)
+     * @param $message
+     * @param $colour
+     * @return string
+     */
+    private static function addColourToMessage($message, $colour) {
 
         if( is_null($colour) || app::isWIN() ){
             return $message;
@@ -78,6 +107,10 @@ class output
         return sprintf("\033[%sm%s\033[0m",$colourCode,$message);
     }
 
+    /**
+     * Detect width of terminal to help with centering (UNIX Only, WIN=80)
+     * @return int|string
+     */
     public static function getWidth(){
 
         if( app::isWIN() ) {
@@ -87,6 +120,11 @@ class output
         return exec('tput cols');
     }
 
+    /**
+     * Center text based on terminal width and message length
+     * @param $message
+     * @return string
+     */
     private static function centerAlignMessage($message) {
         $messageLength = self::getMessageLength($message);
 
@@ -99,22 +137,41 @@ class output
         return str_pad($message, $leftPadding + $messageLength, ' ', STR_PAD_LEFT);
     }
 
+    /**
+     * Calculate message length
+     * @param $message
+     * @return int
+     */
     private static function getMessageLength($message){
         return strlen($message);
     }
 
-    private static function addLeftPaddingToMessage($message,$leftPadding) {
+    /**
+     * Add left padding to message
+     * @param $message
+     * @param $leftPadding
+     * @return string
+     */
+    private static function addLeftPaddingToMessage($message, $leftPadding) {
         $messageLength = self::getMessageLength($message);
         return str_pad($message, $leftPadding + $messageLength, ' ', STR_PAD_LEFT);
     }
 
+    /**
+     * Output error message to terminal
+     * @param $message
+     */
     public static function responseError($message) {
         self::message('!!'.$message,5,'red');
     }
 
+    /**
+     * Clear terminal
+     */
     public static function clearScreen(){
         if( app::isWIN() ) {
             echo str_repeat("\n", 200);
+            system('clr');
         } else {
             system('clear');
         }

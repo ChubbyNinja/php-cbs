@@ -6,7 +6,7 @@
  * Time: 23:55
  */
 
-function cbsAutoloader($class) {
+function cbsAutoLoader($class) {
 
     if( substr($class,0,3) != 'CBS' ) {
         return;
@@ -16,4 +16,4 @@ function cbsAutoloader($class) {
     include CLASS_PATH . $className . '.php';
 }
 
-spl_autoload_register('cbsAutoloader');
+spl_autoload_register('cbsAutoLoader');

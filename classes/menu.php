@@ -9,14 +9,24 @@
 namespace CBS;
 
 
+/**
+ * Class menu
+ * @package CBS
+ */
 class menu
 {
 
+    /**
+     * Print the start up screen (UI Only)
+     */
     public function printInit() {
         $this->printWelcomeScreen();
         $this->printMainMenu();
     }
 
+    /**
+     * Print the welcome header (UI Only)
+     */
     public function printWelcomeScreen() {
         output::clearScreen();
         output::lineBreak('~');
@@ -28,6 +38,9 @@ class menu
         output::blankRow();
     }
 
+    /**
+     * Print the main menu (UI Only)
+     */
     public function printMainMenu() {
 
         output::message('What would you like to do?', 5);
