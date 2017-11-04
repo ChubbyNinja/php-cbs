@@ -200,9 +200,57 @@ class movies extends menu
 
         if( strtolower($response) == 'y' ) {
             $this->deleteMovieFromDatabase();
+
+            $this->printMovieWelcomeScreen('The following movie has been removed:');
+            output::message('Movie Title: ' . $this->getMovieTitle(),5);
+            output::message('Movie Air Date: ' . $this->getMovieDate(),5);
+            output::message('Movie Air Time: ' . $this->getMovieTime(),5);
+
+            output::blankRow();
+            $this->waitForReturnToMenu();
         }
 
         $this->printInit();
+    }
+
+    public function deleteMovieCLI() {
+
+        global $argv;
+
+        if( !isset($argv[2]) ) {
+            output::responseError('No movie ID set');
+            exit;
+        }
+
+        $movieId = $argv[2];
+
+        if( !$this->loadMovieData($movieId) ) {
+            exit;
+        }
+        $this->deleteMovieFromDatabase();
+
+        output::message('Movie: ' . $this->movieTitle . ' was deleted');
+    }
+
+    public function deleteBookingCLI() {
+
+        global $argv;
+
+        if( !isset($argv[2]) ) {
+            output::responseError('No booking ID set');
+            exit;
+        }
+
+        $bookingId = $argv[2];
+        $booking = new bookings($this);
+        $booking->setBookingId($bookingId);
+        if(!$booking->loadBookingData()) {
+            exit;
+        }
+
+        $booking->deleteBookingFromDatabase();
+
+        output::message('Booking: ' . $booking->getCustomerName() . ' was deleted');
     }
 
     private function addMovieToDatabase() {
@@ -229,12 +277,14 @@ class movies extends menu
 
         if( !$this->getMovieId() ) {
             output::responseError('No movie ID set');
+            return false;
         }
 
         $obj = \R::load('movie', $this->getMovieId());
 
         if( !$obj->getID() ) {
             output::responseError('No movie found');
+            return false;
         }
 
         $this->setMovieTitle($obj->movieTitle);
@@ -246,6 +296,8 @@ class movies extends menu
         $bookings = new bookings($this);
 
         $this->setBookingData($bookings);
+
+        return true;
 
     }
 
@@ -331,7 +383,6 @@ class movies extends menu
 
     }
 
-
     public function addBooking()
     {
         $this->printMovieWelcomeScreen('Movie List');
@@ -359,10 +410,40 @@ class movies extends menu
 
     public function listBookings(){
         $this->printMovieWelcomeScreen('Booking List');
+
+        $this->getMovieList();
+
+        output::message('What movie ID would you like to view bookings for?', 5);
+        output::message('Hint: type 0 to display all bookings',5);
+        $movieId = (new input())->getIntResponse(0,99)->getInputData();
+
+
+        if( $movieId == 0 ) {
+            $this->printMovieWelcomeScreen('Booking List: Viewing All');
+        } else {
+            $m = new movies();
+            $m->loadMovieData($movieId);
+            $this->printMovieWelcomeScreen('Booking List: ' . $m->getMovieTitle());
+        }
+
         $booking = new bookings($this);
-        $booking->getBookingList();
+        $booking->getBookingList($movieId);
+
 
         $this->waitForReturnToMenu();
+    }
+
+    public function listBookingsCLI() {
+
+        global $argv;
+
+        $movieId = null;
+        if( isset($argv[2]) ) {
+            $movieId = trim($argv[2]);
+        }
+
+        $booking = new bookings($this);
+        $booking->getBookingList($movieId);
     }
 
     public function deleteBooking() {
@@ -384,6 +465,13 @@ class movies extends menu
             if( strtolower($response) == 'y' ) {
                 $booking->deleteBookingFromDatabase();
 
+                $this->printMovieWelcomeScreen('The following booking has been removed:');
+
+                output::message('Booking ID: ' . $booking->getBookingId(), 5 );
+                output::message('Customer Name: ' . $booking->getCustomerName(), 5 );
+
+                $this->waitForReturnToMenu();
+
             }
             $this->printInit();
         } else {
@@ -391,4 +479,126 @@ class movies extends menu
         }
     }
 
+    public function addMovieCLI(){
+
+        global $argv;
+
+        if( !isset($argv[4]) ) {
+            output::responseError('Please add all parameters');
+            output::message('Examples:');
+            output::message('addmovie "movie title" "movie date" "movie time"');
+            output::message('addmovie "The Avengers" "next saturday" "12:30"');
+            exit;
+        }
+
+        $movieTitle = trim($argv[2]);
+        $movieDate = trim($argv[3]);
+        $movieTime = trim($argv[4]);
+
+        if( empty($movieTitle) ) {
+            output::responseError('Movie title cannot be empty');
+            exit;
+        }
+
+
+        $input = new input();
+
+        if( !$input->validateDate($movieDate) ) {
+            output::responseError('Invalid date format');
+            output::responseError('Use "next tuesday" or "24/10/2018"');
+            exit;
+        }
+
+        if( !$input->validateTime($movieTime) ) {
+            output::responseError('Please format the time as HH:MM');
+            exit;
+        }
+
+
+
+        $this->setMovieTitle($movieTitle);
+        $this->setMovieDate($movieDate);
+        $this->setMovieTime($movieTime);
+
+
+
+        $this->addMovieToDatabase();
+        $this->loadMovieData();
+
+        output::message('Great, Movie Added');
+        output::message('Movie ID: ' . $this->getMovieId());
+        output::message('Movie Title: ' . $this->getMovieTitle());
+        output::message('Movie Air Date: ' . $this->getMovieDate());
+        output::message('Movie Air Time: ' . $this->getMovieTime());
+
+    }
+
+    public function addBookingCLI() {
+
+        global $argv;
+
+        if( !isset($argv[4]) ) {
+            output::responseError('Please add all parameters');
+            output::message('Examples:');
+            output::message('addbooking "movie id" "customer name" "seats required"');
+            output::message('addbooking 3 "John Smith" 1');
+            exit;
+        }
+
+        $movieId = trim($argv[2]);
+        $customerName = trim($argv[3]);
+        $seatsRequired = trim($argv[4]);
+
+        if( !$this->loadMovieData($movieId) ) {
+            exit;
+        }
+
+        if( !$customerName ) {
+            output::responseError('Customer name cannot be blank');
+            exit;
+        }
+
+        if( !is_numeric($seatsRequired) ) {
+            output::responseError('Number of seats must be a valid number');
+            exit;
+        }
+
+        $seatsAvailable = $this->getBookingData()->availableSeats();
+
+        if( $seatsAvailable < $seatsRequired ) {
+            output::responseError(sprintf('There are only %d seats available', $seatsAvailable));
+            exit;
+        }
+
+        $allocatedSeats = $this->getBookingData()->getAllocatedSeatsForMovie();
+
+        $seatsForThisBooking = [];
+
+        $loopedSeats = 1;
+        $bookingSeatsAllocated = 0;
+
+        while($loopedSeats <= 10 && $bookingSeatsAllocated != $seatsRequired){
+
+            if( !in_array($loopedSeats, $allocatedSeats) ) {
+                $seatsForThisBooking[] = $loopedSeats;
+                $bookingSeatsAllocated++;
+            }
+
+
+            $loopedSeats++;
+        }
+
+        $this->getBookingData()->setBookingSeats($seatsForThisBooking);
+        $this->getBookingData()->setCustomerName($customerName);
+
+        $bookingId = $this->getBookingData()->confirmBooking();
+
+
+        output::message('Great, booking confirmed');
+        output::message('Booking ID: ' . $bookingId);
+        output::message('Movie: ' . $this->getMovieTitle());
+        output::message('Customer Name: ' . $customerName);
+        output::message('Seats Allocated: ' . implode(',', $seatsForThisBooking));
+
+    }
 }

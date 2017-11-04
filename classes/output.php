@@ -11,12 +11,6 @@ namespace CBS;
 
 class output
 {
-    static $width;
-
-    function __construct()
-    {
-        //echo exec('tput cols');
-    }
 
     public static function message( $message, $align = 'left', $colour = null ) {
 
@@ -63,7 +57,7 @@ class output
 
     private static function addColourToMessage($message,$colour) {
 
-        if( is_null($colour) ){
+        if( is_null($colour) || app::isWIN() ){
             return $message;
         }
 
@@ -85,11 +79,16 @@ class output
     }
 
     public static function getWidth(){
-        return 80;
+
+        if( app::isWIN() ) {
+            return 80;
+        }
+
+        return exec('tput cols');
     }
 
     private static function centerAlignMessage($message) {
-        $messageLength = self::getMessagelength($message);
+        $messageLength = self::getMessageLength($message);
 
         if( $messageLength >= self::getWidth() ) {
             return $message;
@@ -100,20 +99,24 @@ class output
         return str_pad($message, $leftPadding + $messageLength, ' ', STR_PAD_LEFT);
     }
 
-    private static function getMessagelength($message){
+    private static function getMessageLength($message){
         return strlen($message);
     }
 
     private static function addLeftPaddingToMessage($message,$leftPadding) {
-        $messageLength = self::getMessagelength($message);
+        $messageLength = self::getMessageLength($message);
         return str_pad($message, $leftPadding + $messageLength, ' ', STR_PAD_LEFT);
     }
 
     public static function responseError($message) {
-        self::message('!!'.$message,0,'red');
+        self::message('!!'.$message,5,'red');
     }
 
     public static function clearScreen(){
-        system('clear');
+        if( app::isWIN() ) {
+            echo str_repeat("\n", 200);
+        } else {
+            system('clear');
+        }
     }
 }

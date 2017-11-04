@@ -39,9 +39,11 @@ class menu
         output::message('6. Remove a booking', 5);
         output::message('7. List bookings', 5);
         output::blankRow();
+        output::message('0. Exit', 5);
+        output::blankRow();
 
         $input = new input();
-        $response = $input->getIntResponse(1,7)->getInputData();
+        $response = $input->getIntResponse(0,7)->getInputData();
 
 
         switch( $response ) {
@@ -78,6 +80,11 @@ class menu
             case 7:
                 $movies = new movies();
                 $movies->listBookings();
+                break;
+
+            case 0:
+                output::clearScreen();
+                exit;
                 break;
         }
 

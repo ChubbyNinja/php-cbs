@@ -8,7 +8,6 @@ namespace CBS;
  */
 
 global $argv;
-//error_reporting(0);
 
 define('APPLICATION_ROOT', __DIR__);
 define('INC_PATH', APPLICATION_ROOT .'/inc/');

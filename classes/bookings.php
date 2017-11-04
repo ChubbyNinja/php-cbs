@@ -168,7 +168,7 @@ class bookings
         return array_column($allocatedSeats, 'seat_number');
     }
 
-    private function getAllocatedSeatsForMovie( ) {
+    public function getAllocatedSeatsForMovie( ) {
         $allocatedSeats = \R::getAll("SELECT `seat_number` FROM seat WHERE movie_id = ? ", [$this->getMovieData()->getMovieId()]);
         return array_column($allocatedSeats, 'seat_number');
     }
@@ -279,16 +279,20 @@ class bookings
 
         if( !$this->getBookingId() ) {
             output::responseError('No booking ID set');
+            return false;
         }
 
         $obj = \R::load('booking', $this->getBookingId());
 
         if( !$obj->getID() ) {
             output::responseError('No booking found');
+            return false;
         }
 
         $this->setCustomerName($obj->customerName);
         $this->setBookingData($obj);
+
+        return true;
 
     }
 
@@ -313,8 +317,13 @@ class bookings
 
     }
 
-    public function getBookingList(){
-        $obj = \R::findAll('booking');
+    public function getBookingList($movieId = null){
+
+        if( $movieId && $movieId > 0 ) {
+            $obj = \R::findAll('booking', ' WHERE movie_id = ? ', [$movieId]);
+        } else {
+            $obj = \R::findAll('booking');
+        }
 
         $str = 'ID: %s | %s | %s | seats: %s';
 
@@ -322,10 +331,12 @@ class bookings
             foreach ($obj as $item) {
 
                 $seats = $this->getAllocatedSeatsForBooking( $item->getId() );
-
                 $m = new movies();
                 $m->loadMovieData($item->movieId);
-                output::message(sprintf($str, $item->getId(), $m->getMovieTitle(), $item->customerName,  implode(', ', $seats) ), 5);
+
+                $movieString = $m->getMovieTitle() . ', Date: ' . $m->getMovieDate() . ' @ ' . $m->getMovieTime();
+
+                output::message(sprintf($str, $item->getId(), $movieString, $item->customerName,  implode(', ', $seats) ), 5);
             }
         } else {
             output::message('No bookings available to view.', 5);

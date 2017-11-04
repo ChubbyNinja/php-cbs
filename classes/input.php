@@ -93,9 +93,8 @@ class input
             return $this->getDateResponse($cancel);
         }
 
-        $unixTimestamp = strtotime($result);
 
-        if( !$unixTimestamp ) {
+        if( !$this->validateDate($result) ) {
             output::responseError('Invalid date format');
             return $this->getDateResponse($cancel);
         }
@@ -121,8 +120,8 @@ class input
             return $this->getDateResponse();
         }
 
-        preg_match("/^(?:[01][0-9]|2[0-3]):[0-5][0-9]/", $result, $matched);
-        if( !$matched ) {
+
+        if( !$this->validateTime($result) ) {
             output::responseError('Please format the time as HH:MM');
             return $this->getTimeResponse();
         }
@@ -131,6 +130,17 @@ class input
         return $this;
 
 
+    }
+
+    public function validateDate($input) {
+        $unixTimestamp = strtotime($input);
+
+        return $unixTimestamp;
+    }
+
+    public function validateTime($input) {
+        preg_match("/^(?:[01][0-9]|2[0-3]):[0-5][0-9]/", $input, $matched);
+        return $matched;
     }
 
     private function userInput($cancel = false) {
