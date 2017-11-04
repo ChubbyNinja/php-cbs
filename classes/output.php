@@ -114,6 +114,6 @@ class output
     }
 
     public static function clearScreen(){
-        system('cls');
+        system('clear');
     }
 }

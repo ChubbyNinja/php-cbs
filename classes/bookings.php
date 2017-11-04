@@ -193,6 +193,10 @@ class bookings
         output::message('Which seats would you like to book?', 5);
         output::message('Hint: Provide seat numbers separated by a comma', 5);
         $seats = (new input())->getStringResponse(true)->getInputData();
+
+        if(!$seats){
+            $this->getMovieData()->printInit();
+        }
         $seatNumbers = explode(',', $seats);
 
         if( !$this->checkSeatsAvailable($seatNumbers) ){
@@ -262,6 +266,9 @@ class bookings
             \R::store($obj);
         }
 
+        $this->setBookingId($bookingId);
+        $this->loadBookingData($bookingId);
+
         return $bookingId;
     }
 
@@ -285,9 +292,10 @@ class bookings
 
     }
 
-    public function printBookingDetails() {
+    public function printBookingDetails($menu = true) {
 
         $m = new movies();
+
         $m->loadMovieData($this->getBookingData()->movieId);
 
         $seats = $this->getAllocatedSeatsForBooking($this->getBookingId());
@@ -298,6 +306,10 @@ class bookings
         output::message('Customer Name: ' . $this->getCustomerName(), 5 );
 
         output::message('Seats Allocated: ' . implode(', ', $seats), 5);
+
+        if( $menu ) {
+            $this->getMovieData()->waitForReturnToMenu();
+        }
 
     }
 
@@ -315,14 +327,17 @@ class bookings
                 $m->loadMovieData($item->movieId);
                 output::message(sprintf($str, $item->getId(), $m->getMovieTitle(), $item->customerName,  implode(', ', $seats) ), 5);
             }
+        } else {
+            output::message('No bookings available to view.', 5);
         }
         output::blankRow();
     }
 
 
     public function deleteBookingFromDatabase() {
-        \R::trash($this->getBookingData());
+
         \R::exec("DELETE FROM seat WHERE booking_id = ? ",[$this->getBookingId()]);
+        \R::trash($this->getBookingData());
         return true;
     }
 }

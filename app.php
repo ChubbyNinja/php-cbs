@@ -7,6 +7,7 @@ namespace CBS;
  * Time: 23:42
  */
 
+global $argv;
 //error_reporting(0);
 
 define('APPLICATION_ROOT', __DIR__);

@@ -174,7 +174,7 @@ class movies extends menu
         output::message('Movie Air Time: ' . $this->getMovieTime(),5);
 
         output::blankRow();
-        output::message('To confirm type: Y');
+        output::message('To confirm type: Y', 5);
         $response = (new input())->getStringResponse()->getInputData();
         return $response;
 
@@ -201,7 +201,8 @@ class movies extends menu
         if( strtolower($response) == 'y' ) {
             $this->deleteMovieFromDatabase();
         }
-        return true;
+
+        $this->printInit();
     }
 
     private function addMovieToDatabase() {
@@ -282,7 +283,7 @@ class movies extends menu
     }
 
     public function getMovieList() {
-        $obj = \R::findAll('movie');
+        $obj = \R::findAll('movie', ' ORDER BY `movie_showing` ASC ');
 
         $str = 'ID: %s | %s @ %s | %s';
 
@@ -292,6 +293,8 @@ class movies extends menu
                 $m->loadMovieData($item->getId());
                 output::message(sprintf($str, $m->getMovieId(), $m->getMovieDate(), $m->getMovieTime(), $m->getMovieTitle()), 5);
             }
+        } else {
+            output::message('No movies available to view.', 5);
         }
         output::blankRow();
     }
@@ -346,7 +349,6 @@ class movies extends menu
 
 
             if ($booking->getBookingId()) {
-                $this->printMovieWelcomeScreen('Movie: ' . $m->getMovieTitle() . ',  Date: ' . $m->getMovieDate() . ' @ ' . $m->getMovieTime());
                 $booking->printBookingDetails();
             }
 
@@ -374,9 +376,9 @@ class movies extends menu
             $booking->setBookingId($bookingId);
             $booking->loadBookingData();
 
-            $booking->printBookingDetails();
+            $booking->printBookingDetails(false);
             output::blankRow();
-            output::message('To confirm type: Y');
+            output::message('To confirm type: Y',5);
             $response = (new input())->getStringResponse()->getInputData();
 
             if( strtolower($response) == 'y' ) {
