@@ -27,5 +27,4 @@ define('MYSQL_DB', 'phpcbs');
  */
 define('MYSQL_PASS','phpcbs');
 
-\R::setup( "mysql:host=127.0.0.1;dbname=".MYSQL_DB,
-    MYSQL_USER, MYSQL_PASS );
+\R::setup( "mysql:host=".MYSQL_HOST.";dbname=".MYSQL_DB, MYSQL_USER, MYSQL_PASS );
