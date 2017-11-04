@@ -16,6 +16,7 @@ This can be invoked like so
 
 ## Using the User Interface
 
+
 You are able to load a text based user interface to navigate
 different parts of the booking system.
 
@@ -27,7 +28,7 @@ php ./app.php ui
 or
 
 ```
-./app.sh
+./app.sh ui
 ```
 
 ## Commands Available
@@ -42,7 +43,7 @@ or
  
  
  
- | command | Example |
+ | Command | Example |
  | --- | :--- |
  | addmovie | addmovie "The Avengers" "next wednesday" 10:30 |
  | listmovies | |
