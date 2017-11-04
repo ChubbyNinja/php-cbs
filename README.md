@@ -31,12 +31,12 @@ different parts of the booking system.
 To run the application in this mode, you should pass the parameter `ui`
 
 ```
-php ./app.php ui
+./app.sh ui
 ```
 or
 
 ```
-./app.sh ui
+php ./app.php ui
 ```
 
 ## Commands Available
@@ -50,7 +50,7 @@ or
  - `delbooking` - Deletes a booking
  
  
- #### ui
+ ### ui
  
  **Usage** 
  
@@ -66,7 +66,7 @@ or
  
  ---
  
- #### addmovie
+ ### addmovie
  
  **Usage** 
  
@@ -89,7 +89,8 @@ or
  ```
  
   ---
- #### listmovies
+  
+ ### listmovies
  
   **Usage** 
   
@@ -104,7 +105,8 @@ or
  Lists all movies in date/time order
  
    ---
- #### delmovie
+   
+ ### delmovie
  
   **Usage** 
   
@@ -118,7 +120,8 @@ or
  Deletes the movie
  
   ---
- ####addbooking
+  
+ ### addbooking
  
   **Usage** 
   
@@ -142,8 +145,8 @@ or
  Example 1 will allocate 1 seat to John Smith, and example 2 will allocate 3 seats.
  
    ---
- 
- #### listbookings
+   
+ ### listbookings
  
  
   **Usage** 
@@ -159,7 +162,8 @@ or
   Lists the bookings against a specific movie, `<MovieID>` is an optional parameter, if omitted will list all bookings.
   
    ---
-  #### delbooking
+   
+  ### delbooking
   
   
   **Usage** 
@@ -175,7 +179,8 @@ or
  Deletes the booking
    
   ---
- ####help
+  
+ ###help
  
 
   
