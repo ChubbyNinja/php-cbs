@@ -171,7 +171,7 @@ class output
     public static function clearScreen(){
         if( app::isWIN() ) {
             echo str_repeat("\n", 200);
-            system('clr');
+            //system('clr');
         } else {
             system('clear');
         }
